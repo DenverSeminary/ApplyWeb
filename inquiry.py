@@ -10,7 +10,7 @@ def convert_date(value):
 	return datetime.strftime(date_object, '%m/%d/%y')
 	
 #CONNECTION_STRING="Driver={IBM INFORMIX ODBC DRIVER};Host=hewey;Server=hewey;Service=istarcarsi;Protocol=olsoctcp;Database=train;Uid=sethw;Pwd=missy79; "
-CONNECTION_STRING="Driver={IBM INFORMIX ODBC DRIVER (64-bit)};Host=hewey;Server=hewey;Service=istarcarsi;Protocol=olsoctcp;Database=train;Uid=sethw;Pwd=missy79; "
+CONNECTION_STRING="%s"
 reader = csv.DictReader(open("C:\\Users\\sethw\\Desktop\\20110207.csv", "rb"))
 inquiries = []
 db = odbc.odbc(CONNECTION_STRING)
