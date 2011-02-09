@@ -2,21 +2,16 @@
 '''
 	Processes and parses the inquiry information
 '''
-import odbc, csv
+import odbc, csv, config
 from datetime import datetime
 
 def convert_date(value):		
 	date_object = datetime.strptime(value, '%Y-%m-%d')
 	return datetime.strftime(date_object, '%m/%d/%y')
 	
-#CONNECTION_STRING="Driver={IBM INFORMIX ODBC DRIVER};Host=hewey;Server=hewey;Service=istarcarsi;Protocol=olsoctcp;Database=train;Uid=sethw;Pwd=missy79; "
-CONNECTION_STRING="%s"
+CONNECTION_STRING = config.get_config('db','x64_CONNECTION_STRING')
 reader = csv.DictReader(open("C:\\Users\\sethw\\Desktop\\20110207.csv", "rb"))
 inquiries = []
-db = odbc.odbc(CONNECTION_STRING)
-print "CONNECTED"
-db.close()
-print "CLOSED"
 for row in reader:
 	row["FULLNAME"] = "%s, %s %s" % (row["NAME_LAST"].strip(), row["NAME_FIRST"].strip(), row["NAME_MIDDLE"].strip())
 	print row["FULLNAME"]
