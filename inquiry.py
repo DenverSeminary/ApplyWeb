@@ -9,8 +9,8 @@ def convert_date(value):
 	date_object = datetime.strptime(value, '%Y-%m-%d')
 	return datetime.strftime(date_object, '%m/%d/%y')
 	
-CONNECTION_STRING = config.get_config('db','x64_CONNECTION_STRING')
-reader = csv.DictReader(open("C:\\Users\\sethw\\Desktop\\20110207.csv", "rb"))
+CONNECTION_STRING = str(config.get_config('db','x64_CONNECTION_STRING'))
+reader = csv.DictReader(open("C:\\Users\\sethw\\Desktop\\20110209.csv", "rb"))
 inquiries = []
 for row in reader:
 	row["FULLNAME"] = "%s, %s %s" % (row["NAME_LAST"].strip(), row["NAME_FIRST"].strip(), row["NAME_MIDDLE"].strip())
@@ -76,8 +76,8 @@ for row in reader:
 	cur.execute(sql, params)
 			
 	sql = '''insert into app_admtmp_rec (id, plan_enr_sess, plan_enr_yr, prog, subprog, add_date, ref_source, enrstat, major, major2, deg, app_source, jics_candidate)
-		values (?,?,?,?,'NA', DATE(?),?,?,?,?,?,?)'''
-	params = [new_id, row["DSEMINQ-ENROLL_SESSION"], row["DSEMINQ-ENROLL_YEAR"], 'MSTR', row["DSEMINQ-TRANSACTION_DATE"], row["DSEMINQ-HOW_HEARD"], 'INQUIRED', row["DSEMINQ-MAJOR"], 'NA', row["DSEMINQ-DEGREE"], 'WEB', 'N']
+		values (?,?,?,?,?, DATE(?),?,?,?,?,?,?,?)'''
+	params = [new_id, row["DSEMINQ-ENROLL_SESSION"], row["DSEMINQ-ENROLL_YEAR"], 'MSTR', 'NA', row["DSEMINQ-TRANSACTION_DATE"], row["DSEMINQ-HOW_HEARD"], 'INQUIRED', row["DSEMINQ-MAJOR"], 'NA', row["DSEMINQ-DEGREE"], 'WEB', 'N']
 		
 	print sql
 	print params

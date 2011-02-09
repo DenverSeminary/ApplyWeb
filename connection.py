@@ -5,7 +5,6 @@
 '''
 import paramiko, time, datetime, dbclient, config
 
-
 class SFTPConnection():
 	def get_file_list(self):
 		transport = paramiko.Transport( (config.get_config('sftp','SERVER'), int(config.get_config('sftp','PORT'))) )
