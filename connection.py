@@ -5,25 +5,8 @@
 '''
 import paramiko, time, datetime, dbclient
 
-SERVER = "sftp.applyweb.com"
-PORT = 22
-USERNAME = "dsemftp"
-PASSWORD = "collegenet"
-PATH = "dsem/"
 
-'''
-for file in files:
-	print file
-for attr in files:	
-	print attr.filename	
-	print attr.st_mtime
-	print time.ctime(int(attr.st_mtime))	
-	print datetime.date.fromtimestamp(int(attr.st_mtime))
 
-#print files
-sftp.close()
-transport.close()
-'''
 class SFTPConnection():
 	def get_file_list(self):
 		transport = paramiko.Transport( (SERVER, PORT) )

@@ -4,18 +4,7 @@
 '''
 import odbc, csv
 from datetime import datetime
-#CONNECTION_STRING="DRIVER={SQL Server};SERVER=abraham;DATABASE=eqcas;Trusted_Connection=true;"
-'''
-def DB():
-    CONNECTION_STRING="Driver={IBM INFORMIX ODBC DRIVER};Host=hewey;Server=hewey;Service=istarcarsi;Protocol=olsoctcp;Database=train;Uid=sethw;Pwd=missy79; "
-    db = odbc.odbc(CONNECTION_STRING)
-	c = db.cursor()
-	db.close()
-	
-	
-def ParseFile(file_name):
-    reader = csv.DictReader(open(file_name,"rb"))
-'''
+
 def convert_date(value):		
 	date_object = datetime.strptime(value, '%Y-%m-%d')
 	return datetime.strftime(date_object, '%m/%d/%y')
