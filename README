@@ -1,0 +1,15 @@
+This is a set of python scripts that we use to synchronize our ApplyWeb applications and inquiries to our Jenzabar CX database. 
+
+External Python Dependencies:
+-----------------------------
+* win32 extensions (or pyodbc) - odbc connections
+* paramiko - sftp
+* httplib2 - interaction with the tracking database
+
+
+Process Flow:
+--------------------------------------------------------
+* Get a list of files on the remote server (ApplyWeb).
+* Loop through the list of files and determine if the file has already been downloaded/already exists in the data directory
+* If the file does not already exist, pull the data file from the server
+* Load the files into the temporary application section of the database.
