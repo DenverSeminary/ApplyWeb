@@ -12,3 +12,6 @@ conn = connection.SFTPConnection()
 file_list = conn.get_file_list()
 
 print file_list
+
+for filename in file_list:
+	print filename
