@@ -9,7 +9,8 @@ External Python Dependencies:
 
 Process Flow:
 --------------------------------------------------------
-* Get a list of files on the remote server (ApplyWeb).
-* Loop through the list of files and determine if the file has already been downloaded/already exists in the data directory
-* If the file does not already exist, pull the data file from the server
-* Load the files into the temporary application section of the database.
+1. Get a list of files on the remote server (ApplyWeb).
+2. Loop through the list of files and determine if the file has already been downloaded/already exists in the data directory
+3. If the file does not already exist, pull the data file from the server
+4. Load the files into the temporary application section of the Informix database
+	a. iterate through the files 

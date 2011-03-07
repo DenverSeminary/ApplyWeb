@@ -1,27 +1,17 @@
-import time
-import urllib
-import httplib
+'''
+	db.py (not to be confused with dbi.py which is kyoto product-based) is the database interface for ApplyWeb "process progress" database (Redis). This database will store information about whether or not the file has been processed
+'''
+import redis
+import simplejson as json
 
-class DBClient:
-	def open(self, host="lindev", port=1978, timeout=30):
-		self.ua = httplib.HTTPConnection(host,port)
-	def close(self):
-		self.ua.close()
-	def set(self, key, value, xt = None):
-		if isinstance(key, str): key = key.encode("UTF-8")
-		if isinstance(value, str): value = value.encode("UTF-8")
-		key = "/files.kch/" + urllib.quote(key)
-		headers = {}
-		if xt != None:
-			xt = int(time.time()) + xt
-			headers["X-Kt-Xt"] = str(xt)
-		self.ua.request("PUT", key, value, headers)
-		res = self.ua.getresponse()
-		body = res.read()
-		return res.status == 201
-	def get(self, key):
-		if isinstance(key, str): key = key.encode("UTF-8")
-		key = "/files.kch/" + urllib.quote(key)
-		res = self.ua.request("GET", key)
-		body = res.read()
-		return body
+r = redis.Redis(host='sp-dev')
+
+
+def store_stats(filename, stats):
+	r[filename] = json.dumps(stats)
+	
+def get_stats(filename):
+	if r[filename] is not None:
+		return json.loads(r[filename])
+	else:
+		return None

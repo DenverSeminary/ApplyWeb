@@ -4,7 +4,7 @@
 '''
 #import dbclient, connection
 
-import connection
+import connection, inquiry
 
 
 conn = connection.SFTPConnection()
@@ -15,3 +15,5 @@ print file_list
 
 for filename in file_list:
 	print filename
+	if filename.find('INQ') > -1:
+		inquiry.process(filename)
