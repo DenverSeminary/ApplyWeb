@@ -36,76 +36,72 @@ def scan_dupe(lastname, firstname, middle, state):
 				middlematch = True		
 			if result[4].strip() == state:				
 				statematch = True		
-			dup_info[result[0]] = {'LastName': lastname, 'FirstName': firstname, 'MiddleName': middle, 'State': state, 'MatchedMiddle': middlematch, 'MatchedState': statematch}	
+			dup_info[result[0]] = {'LastName': result[1], 'FirstName': result[2], 
+                'MiddleName': result[3], 'State': result[4], 'MatchedMiddle': middlematch, 'MatchedState': statematch}	
 	return dup_info, (middlematch or statematch)	#I may need to look into this
 	
+def load_data(row):
+	try:
+		row["DSEMINQ-TRANSACTION_DATE"] = convert_date(row["DSEMINQ-TRANSACTION_DATE"])
+	except:
+		row["DSEMINQ-TRANSACTION_DATE"] = row["DSEMINQ-TRANSACTION_DATE"]		
+	try:
+		row["BIRTH_DATE"] = convert_date(row["BIRTH_DATE"])
+	except:
+		row["BIRTH_DATE"] = row["BIRTH_DATE"]		
+	sql = "insert into apptmp_rec (app_source, add_date, stat, birth_date) values (?, TO_DATE(?, '%m/%d/%y'), ?, TO_DATE(?, '%m/%d/%y'))"
+	params = ['WEB', row["DSEMINQ-TRANSACTION_DATE"], 'C', row["BIRTH_DATE"]]		
+	print sql, params						
+	cur.execute(sql, params)	
+	cur.execute("select dbinfo('sqlca.sqlerrd1') from apptmp_rec")
+	results = cur.fetchone()
+	new_id = results[0]			
+	sql = '''insert into app_idtmp_rec (id, fullname, addr_line1, city, st, zip, ctry, aa, title, ss_no, 
+				phone, add_date, ofc_add_by, firstname, lastname, email) 
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?, '%m/%d/%y'), ?, ?, ?, ?)'''
+	params = [new_id, row['FULLNAME'], row["MAIL_STREET"], row["MAIL_CITY"], row["MAIL_STATE"], row["MAIL_ZIP"], row["MAIL_COUNTRY"], 
+			'HOME', row["DSEMINQ-TITLE"], row["SS_NUM"], row["PHONE"], row["DSEMINQ-TRANSACTION_DATE"], 'ADM', row["NAME_FIRST"], row["NAME_LAST"], row["EMAIL"]]		
+			
+	print sql, params
+	cur.execute(sql, params)
+	
+	sql = "insert into app_proftmp_rec (id, birth_date, res_st, res_cty) values (?, TO_DATE(?, '%m/%d/%y'), ?, ?)"
+	params = [new_id, row['BIRTH_DATE'], row['STATE'], row['CITY']]	
+	#need some new logic in here that if STATE == '' then go to MAIL_STATE		
+	print sql, params
+	cur.execute(sql, params)
+	sql = '''insert into app_admtmp_rec (id, plan_enr_sess, plan_enr_yr, prog, subprog, add_date, ref_source, enrstat, major, major2, deg, app_source, jics_candidate)
+		values (?,?,?,?,?, TO_DATE(?, '%m/%d/%y'),?,?,?,?,?,?,?)'''
+	params = [new_id, row["DSEMINQ-ENROLL_SESSION"], row["DSEMINQ-ENROLL_YEAR"], 'MSTR', 'NA', row["DSEMINQ-TRANSACTION_DATE"], row["DSEMINQ-HOW_HEARD"], 'INQUIRED', row["DSEMINQ-MAJOR"], 'NA', row["DSEMINQ-DEGREE"], 'WEB', 'N']
+	print sql, params
+	cur.execute(sql, params)
+	sql = "insert into app_sitetmp_rec (id, beg_date, site, home) VALUES (?, TO_DATE(?, '%m/%d/%y'), ?, ?)"
+	params = [new_id, row["DSEMINQ-TRANSACTION_DATE"], 'CARS', 'Y']
+	print sql, params
+	cur.execute(sql, params)
+	
 def process(filename):		
-	reader = csv.DictReader(open("data\\" + filename, "rb"))
-	inquiries = []
+	reader = csv.DictReader(open("data\\" + filename, "rb"))	
 	flagged_records = {}
-	fileinfo = {}
-	fileinfo['flagged'] = None
+	fileinfo = {}	
 	records = 0
 	for row in reader:
 		records += 1
+		dup_info = {}
 		row["FULLNAME"] = "%s, %s %s" % (row["NAME_LAST"].strip(), row["NAME_FIRST"].strip(), row["NAME_MIDDLE"].strip())		
-		dup_info, isdup = scan_dupe(row["NAME_LAST"].strip(), row["NAME_FIRST"].strip(), row["NAME_MIDDLE"].strip(), row["STATE"].strip())
-		flagged_records[row["FULLNAME"]] = dup_info
+		dup_info, isdup = scan_dupe(row["NAME_LAST"].strip(), row["NAME_FIRST"].strip(), row["NAME_MIDDLE"].strip(), row["STATE"].strip())		
 		if not isdup:
-			try:
-				row["DSEMINQ-TRANSACTION_DATE"] = convert_date(row["DSEMINQ-TRANSACTION_DATE"])
-			except:
-				row["DSEMINQ-TRANSACTION_DATE"] = row["DSEMINQ-TRANSACTION_DATE"]		
-			try:
-				row["BIRTH_DATE"] = convert_date(row["BIRTH_DATE"])
-			except:
-				row["BIRTH_DATE"] = row["BIRTH_DATE"]		
-			sql = "insert into apptmp_rec (app_source, add_date, stat, birth_date) values (?, TO_DATE(?, '%m/%d/%y'), ?, TO_DATE(?, '%m/%d/%y'))"
-			params = ['WEB', row["DSEMINQ-TRANSACTION_DATE"], 'C', row["BIRTH_DATE"]]		
-			print sql, params						
-			cur.execute(sql, params)	
-			cur.execute("select dbinfo('sqlca.sqlerrd1') from apptmp_rec")
-			results = cur.fetchone()
-			new_id = results[0]			
-			sql = '''insert into app_idtmp_rec (id, fullname, addr_line1, city, st, zip, ctry, aa, title, ss_no, 
-						phone, add_date, ofc_add_by, firstname, lastname, email) 
-					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, TO_DATE(?, '%m/%d/%y'), ?, ?, ?, ?)'''
-			params = [new_id, row['FULLNAME'], row["MAIL_STREET"], row["MAIL_CITY"], row["MAIL_STATE"], row["MAIL_ZIP"], row["MAIL_COUNTRY"], 
-					'HOME', row["DSEMINQ-TITLE"], row["SS_NUM"], row["PHONE"], row["DSEMINQ-TRANSACTION_DATE"], 'ADM', row["NAME_FIRST"], row["NAME_LAST"], row["EMAIL"]]		
-					
-			print sql, params
-			cur.execute(sql, params)
-			
-			sql = "insert into app_proftmp_rec (id, birth_date, res_st, res_cty) values (?, TO_DATE(?, '%m/%d/%y'), ?, ?)"
-			params = [new_id, row['BIRTH_DATE'], row['STATE'], row['CITY']]	
-			#need some new logic in here that if STATE == '' then go to MAIL_STATE		
-			print sql, params
-			cur.execute(sql, params)
-					
-			sql = '''insert into app_admtmp_rec (id, plan_enr_sess, plan_enr_yr, prog, subprog, add_date, ref_source, enrstat, major, major2, deg, app_source, jics_candidate)
-				values (?,?,?,?,?, TO_DATE(?, '%m/%d/%y'),?,?,?,?,?,?,?)'''
-			params = [new_id, row["DSEMINQ-ENROLL_SESSION"], row["DSEMINQ-ENROLL_YEAR"], 'MSTR', 'NA', row["DSEMINQ-TRANSACTION_DATE"], row["DSEMINQ-HOW_HEARD"], 'INQUIRED', row["DSEMINQ-MAJOR"], 'NA', row["DSEMINQ-DEGREE"], 'WEB', 'N']
-			
-			print sql, params
-			cur.execute(sql, params)
-			
-			sql = "insert into app_sitetmp_rec (id, beg_date, site, home) VALUES (?, TO_DATE(?, '%m/%d/%y'), ?, ?)"
-			params = [new_id, row["DSEMINQ-TRANSACTION_DATE"], 'CARS', 'Y']
-			print sql, params
-			cur.execute(sql, params)
+			#load_data(row)			
+			pass
 		else: #finished here on 7 march, 2011. flagged_records should contain all of the matches for each record
-			if fileinfo['flagged'] is None:
-				fileinfo['flagged'] = { [row["FULLNAME"]]: dup_info }
-			else:
-				data = fileinfo['flagged']
-				data[row["FULLNAME"]] = dup_info
-				fileinfo['flagged'] = data
+			flagged_records[row["FULLNAME"]] = dup_info
 	'''
 		now i just need to load the file info into the redis db
 	'''
-	import db	
-	fileinfo['totalrecords'] = str(records)
-	fileinfo['flaggedrecords'] = len(fileinfo['flagged'])
-	fileinfo['loaddate'] = 'Today'
+	fileinfo['TotalRecords'] = records	
+	fileinfo['Flagged'] = flagged_records
 	
-	db.store_stats(filename, fileinfo)
+	print json.dumps(fileinfo)
+	
+	
+	
