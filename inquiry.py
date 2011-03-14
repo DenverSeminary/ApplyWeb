@@ -8,6 +8,7 @@ import simplejson as json
 
 #CONNECTION_STRING = str(config.get_config('db','x64_CONNECTION_STRING'))
 CONNECTION_STRING = "dsn=cars"
+#CONNECTION_STRING = "dsn=noah"
 db = odbc.odbc(CONNECTION_STRING)
 cur = db.cursor()
 
@@ -84,6 +85,7 @@ def process(filename):
 	reader = csv.DictReader(open("data\\" + filename, "rb"))	
 	flagged_records = {}
 	fileinfo = {}	
+	fileinfo['StartTime'] = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
 	records = 0
 	for row in reader:
 		records += 1
@@ -99,8 +101,12 @@ def process(filename):
 		now i just need to load the file info into the redis db
 	'''
 	fileinfo['TotalRecords'] = records	
-	fileinfo['Flagged'] = flagged_records
-	
+	fileinfo['FinishTime'] = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
+	fileinfo['FileName'] = filename
+	if len(flagged_records) > 0:
+		fileinfo['Flagged'] = flagged_records
+	import mail
+	mail.notify(fileinfo)
 	print json.dumps(fileinfo)
 	
 	
