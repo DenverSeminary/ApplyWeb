@@ -1,11 +1,7 @@
 #!/usr/bin/python2
 '''
-	SFTP Interface
-
 '''
 import httplib2
-
-
 class dbi:
 	def conn(self):
 		self.conn = httplib2.Http()

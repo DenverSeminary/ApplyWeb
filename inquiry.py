@@ -109,5 +109,11 @@ def process(filename):
 	mail.notify(fileinfo)
 	print json.dumps(fileinfo)
 	
+	import dbi
+	db = dbi.dbi()
+	db.conn()
+	db.set(filename, json.dumps(fileinfo))
+	
+	print 'Data Stored'
 	
 	

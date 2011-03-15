@@ -8,15 +8,18 @@ from email.mime.text import MIMEText
 def format_matches(fileinfo):
 	fuzzy_matches = ''
 	
-	for name, value in fileinfo['Flagged'].iteritems():
-		fuzzy_matches += "<div style='text-indent: 15px;'>%s (note, this is the name as it appears in the file)</div>" % name
-		fuzzy_matches +=  "<div style='text-indent: 25px;'>Potential Matches (data as found in CX):</div>"
-		for id, data in value.iteritems():
-			fuzzy_matches += "<div style='text-indent: 35px;'>Student ID: %s</div>" % id
-			fuzzy_matches += "<div style='text-indent: 35px;'>Student Name: %s %s %s</div>" % (data['FirstName'], data['MiddleName'], data['LastName'])
-			fuzzy_matches += "<div style='text-indent: 35px;'>State: %s</div>" % data['State']
-			fuzzy_matches += "<div style='text-indent: 35px;'>Matched Middle Name: %s</div>" % data['MatchedMiddle']
-			fuzzy_matches += "<div style='text-indent: 35px;'>Matched State: %s</div>" % data['MatchedState']
+	if 'Flagged' in fileinfo.keys():
+		for name, value in fileinfo['Flagged'].iteritems():
+			fuzzy_matches += "<div style='text-indent: 15px;'>%s (note, this is the name as it appears in the file)</div>" % name
+			fuzzy_matches +=  "<div style='text-indent: 25px;'>Potential Matches (data as found in CX):</div>"
+			for id, data in value.iteritems():
+				fuzzy_matches += "<div style='text-indent: 35px;'>Student ID: %s</div>" % id
+				fuzzy_matches += "<div style='text-indent: 35px;'>Student Name: %s %s %s</div>" % (data['FirstName'], data['MiddleName'], data['LastName'])
+				fuzzy_matches += "<div style='text-indent: 35px;'>State: %s</div>" % data['State']
+				fuzzy_matches += "<div style='text-indent: 35px;'>Matched Middle Name: %s</div>" % data['MatchedMiddle']
+				fuzzy_matches += "<div style='text-indent: 35px;'>Matched State: %s</div>" % data['MatchedState']
+	else:
+		fuzzy_matches = 'None'
 			
 	return fuzzy_matches
 
