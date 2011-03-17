@@ -112,7 +112,7 @@ def process(filename):
 	import dbi
 	db = dbi.dbi()
 	db.conn()
-	db.set(filename, json.dumps(fileinfo))
+	db.set(filename.split('.')[0], json.dumps(fileinfo))
 	
 	print 'Data Stored'
 	

@@ -16,11 +16,11 @@ class SFTPConnection():
 		transport.connect(username = config.get_config('sftp','USERNAME'), password = config.get_config('sftp','PASSWORD'))
 		sftp = paramiko.SFTPClient.from_transport(transport)
 		files = []
-		dirfiles = os.listdir('data/')
+		dirfiles = os.listdir('//barnabas/Users/applyweb/')
 		attrs = sftp.listdir_attr(config.get_config('sftp','PATH'))		
 		for attr in attrs:								
 			if (attr.filename + '.csv') not in dirfiles:
-				sftp.get(config.get_config('sftp','PATH') + attr.filename, 'data/' + attr.filename + ".csv")				
+				sftp.get(config.get_config('sftp','PATH') + attr.filename, '//barnabas/Users/applyweb/' + attr.filename + ".csv")				
 				files.append(attr.filename + ".csv")
 		sftp.close()
 		transport.close()				
