@@ -7,8 +7,8 @@ from datetime import datetime
 import simplejson as json
 
 #CONNECTION_STRING = str(config.get_config('db','x64_CONNECTION_STRING'))
-#CONNECTION_STRING = "dsn=cars"
-CONNECTION_STRING = "dsn=noah"
+CONNECTION_STRING = "dsn=cars"
+#CONNECTION_STRING = "dsn=noah"
 db = odbc.odbc(CONNECTION_STRING)
 cur = db.cursor()
 
@@ -82,7 +82,7 @@ def load_data(row):
 	cur.execute(sql, params)
 	
 def process(filename):		
-	reader = csv.DictReader(open("data\\" + filename, "rb"))	
+	reader = csv.DictReader(open('//barnabas/Users/applyweb/' + filename, "rb"))	
 	flagged_records = {}
 	fileinfo = {}	
 	fileinfo['StartTime'] = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
