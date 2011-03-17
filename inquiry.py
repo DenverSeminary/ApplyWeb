@@ -7,8 +7,8 @@ from datetime import datetime
 import simplejson as json
 
 #CONNECTION_STRING = str(config.get_config('db','x64_CONNECTION_STRING'))
-CONNECTION_STRING = "dsn=cars"
-#CONNECTION_STRING = "dsn=noah"
+#CONNECTION_STRING = "dsn=cars"
+CONNECTION_STRING = "dsn=noah"
 db = odbc.odbc(CONNECTION_STRING)
 cur = db.cursor()
 
